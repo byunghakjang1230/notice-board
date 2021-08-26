@@ -1,4 +1,4 @@
-package com.rsupport.notice.domain;
+package com.rsupport.notice.notice.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 @DisplayName("NoticeRepository 단위 테스트")
 @DataJpaTest

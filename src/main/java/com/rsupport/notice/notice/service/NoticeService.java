@@ -1,15 +1,15 @@
-package com.rsupport.notice.service;
+package com.rsupport.notice.notice.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.rsupport.notice.domain.Notice;
-import com.rsupport.notice.domain.NoticeRepository;
-import com.rsupport.notice.dto.NoticeRequest;
-import com.rsupport.notice.dto.NoticeResponse;
-import com.rsupport.notice.exception.NotFoundNoticeException;
-import com.rsupport.notice.exception.NoticePermissionDeniedException;
+import com.rsupport.notice.notice.domain.Notice;
+import com.rsupport.notice.notice.domain.NoticeRepository;
+import com.rsupport.notice.notice.dto.NoticeRequest;
+import com.rsupport.notice.notice.dto.NoticeResponse;
+import com.rsupport.notice.notice.exception.NotFoundNoticeException;
+import com.rsupport.notice.notice.exception.NoticePermissionDeniedException;
 
 @Service
 public class NoticeService {

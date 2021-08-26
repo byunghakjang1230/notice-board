@@ -1,4 +1,4 @@
-package com.rsupport.notice.ui;
+package com.rsupport.notice.notice.ui;
 
 import java.net.URI;
 
@@ -7,9 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.rsupport.notice.service.NoticeService;
-import com.rsupport.notice.dto.NoticeRequest;
-import com.rsupport.notice.dto.NoticeResponse;
+import com.rsupport.notice.notice.service.NoticeService;
+import com.rsupport.notice.notice.dto.NoticeRequest;
+import com.rsupport.notice.notice.dto.NoticeResponse;
 
 @RestController
 @RequestMapping("/api/notices")

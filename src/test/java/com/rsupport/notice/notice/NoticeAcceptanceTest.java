@@ -1,18 +1,14 @@
-package com.rsupport.notice;
+package com.rsupport.notice.notice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import com.rsupport.notice.dto.NoticeRequest;
-import com.rsupport.notice.dto.NoticeResponse;
+import com.rsupport.notice.notice.dto.NoticeRequest;
+import com.rsupport.notice.notice.dto.NoticeResponse;
 import com.rsupport.notice.utils.AcceptanceTest;
 
 import io.restassured.RestAssured;

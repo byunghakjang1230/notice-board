@@ -1,4 +1,4 @@
-package com.rsupport.notice.ui;
+package com.rsupport.notice.notice.ui;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -23,9 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rsupport.notice.service.NoticeService;
-import com.rsupport.notice.dto.NoticeRequest;
-import com.rsupport.notice.dto.NoticeResponse;
+import com.rsupport.notice.notice.service.NoticeService;
+import com.rsupport.notice.notice.dto.NoticeRequest;
+import com.rsupport.notice.notice.dto.NoticeResponse;
 import com.rsupport.notice.utils.MockMvcControllerTest;
 
 @WebMvcTest(controllers = NoticeRestController.class)

@@ -1,4 +1,4 @@
-package com.rsupport.notice.exception;
+package com.rsupport.notice.notice.exception;
 
 public class NoticePermissionDeniedException extends RuntimeException {
     public NoticePermissionDeniedException() {

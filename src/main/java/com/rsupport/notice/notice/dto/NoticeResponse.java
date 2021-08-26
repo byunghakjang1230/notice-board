@@ -1,8 +1,8 @@
-package com.rsupport.notice.dto;
+package com.rsupport.notice.notice.dto;
 
 import java.time.LocalDate;
 
-import com.rsupport.notice.domain.Notice;
+import com.rsupport.notice.notice.domain.Notice;
 
 public class NoticeResponse {
     private Long id;

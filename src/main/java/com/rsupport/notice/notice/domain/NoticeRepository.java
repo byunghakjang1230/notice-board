@@ -1,4 +1,4 @@
-package com.rsupport.notice.domain;
+package com.rsupport.notice.notice.domain;
 
 import java.util.Optional;
 
