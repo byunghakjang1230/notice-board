@@ -111,4 +111,18 @@ class NoticeServiceTest {
                 .isInstanceOf(NoticePermissionDeniedException.class)
                 .hasMessage("공지사항 수정 권한이 없습니다.");
     }
+
+    @Test
+    @DisplayName("공지사항 삭제 서비스")
+    void notice_remove() {
+        // given
+        NoticeRequest noticeRequest = new NoticeRequest("제목", "내용", "user@email.com");
+        given(this.noticeRepository.findByIdAndDeletedIsFalse(anyLong())).willReturn(Optional.of(new Notice("제목", "내용", "user@email.com")));
+
+        // when
+        this.noticeService.deleteNotice(1L, noticeRequest);
+
+        // then
+        verify(this.noticeRepository).delete(any(Notice.class));
+    }
 }

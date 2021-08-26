@@ -65,6 +65,32 @@ class NoticeAcceptanceTest extends AcceptanceTest {
         공지사항_수정_내용_확인(공지사항_수정_결과.as(NoticeResponse.class), noticeModifyRequest);
     }
 
+    @Test
+    @Order(4)
+    @DisplayName("등록된 공지사항을 삭제한다.")
+    void delete_notice() {
+        // given
+        NoticeResponse registeredNotice = 공지사항이_등록되어_있음(new NoticeRequest("제목", "내용", "user@email.com"));
+        NoticeRequest noticeModifyRequest = new NoticeRequest("제목", "내용", "user@email.com");
+
+        // when
+        ExtractableResponse<Response> 공지사항_삭제_결과 = 공지사항_삭제_요청(registeredNotice.getId(), noticeModifyRequest);
+
+        // then
+        공지사항_삭제_요청_성공_확인(공지사항_삭제_결과);
+    }
+
+    private ExtractableResponse<Response> 공지사항_삭제_요청(Long id, NoticeRequest noticeRequest) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(noticeRequest)
+                .delete(DEFAULT_URL + "/" + id)
+                .then().log().all()
+                .extract();
+    }
+
     private ExtractableResponse<Response> 공지사항_등록_요청(NoticeRequest noticeRequest) {
         return RestAssured
                 .given().log().all()
@@ -119,5 +145,9 @@ class NoticeAcceptanceTest extends AcceptanceTest {
 
     private void 공지사항_수정_요청_성공_확인(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void 공지사항_삭제_요청_성공_확인(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }

@@ -28,9 +28,15 @@ public class NoticeService {
 
     public NoticeResponse updateNotice(Long id, NoticeRequest updateNoticeRequest) {
         Notice findNotice = findNoticeOrThrow(id);
-        validateUpdateNoticePermission(findNotice, updateNoticeRequest.getWriter());
+        validateNoticePermission(findNotice, updateNoticeRequest.getWriter());
         findNotice.updateTo(updateNoticeRequest.toNotice());
         return NoticeResponse.of(findNotice);
+    }
+
+    public void deleteNotice(long id, NoticeRequest deleteNoticeRequest) {
+        Notice findNotice = findNoticeOrThrow(id);
+        validateNoticePermission(findNotice, deleteNoticeRequest.getWriter());
+        this.noticeRepository.delete(findNotice);
     }
 
     private Notice findNoticeOrThrow(Long id) {
@@ -38,7 +44,7 @@ public class NoticeService {
                 .orElseThrow(() -> new NotFoundNoticeException("요청한 공지사항이 없습니다."));
     }
 
-    private void validateUpdateNoticePermission(Notice findNotice, String writer) {
+    private void validateNoticePermission(Notice findNotice, String writer) {
         if (!findNotice.hasSameOwner(writer)) {
             throw new NoticePermissionDeniedException("공지사항 수정 권한이 없습니다.");
         }

@@ -30,7 +30,15 @@ public class NoticeRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NoticeResponse> updateNoticeByPutMethod(@PathVariable("id") Long id, @RequestBody NoticeRequest noticeRequest) {
+    public ResponseEntity<NoticeResponse> updateNoticeByPutMethod(@PathVariable("id") Long id,
+                                                                  @RequestBody NoticeRequest noticeRequest) {
         return ResponseEntity.ok(this.noticeService.updateNotice(id, noticeRequest));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteNoticeByDeleteMethod(@PathVariable("id") Long id,
+                                                             @RequestBody NoticeRequest noticeRequest) {
+        this.noticeService.deleteNotice(id, noticeRequest);
+        return ResponseEntity.noContent().build();
     }
 }

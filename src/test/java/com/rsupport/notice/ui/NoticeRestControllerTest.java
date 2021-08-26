@@ -3,6 +3,7 @@ package com.rsupport.notice.ui;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -86,5 +87,22 @@ class NoticeRestControllerTest extends MockMvcControllerTest {
                 .andExpect(jsonPath("title").value(noticeRequest.getTitle()))
                 .andExpect(jsonPath("content").value(noticeRequest.getContent()))
         ;
+    }
+
+    @Test
+    @DisplayName("DELETE 삭제 요청 정상 완료 확인")
+    void delete_remove_notice() throws Exception {
+        // given
+        NoticeRequest noticeRequest = new NoticeRequest("제목", "내용", "user@email.com");
+
+        // when - then
+        this.mockMvc.perform(delete(DEFAULT_REQUEST_URL + "/1")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .content(new ObjectMapper().writeValueAsString(noticeRequest)))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+        ;
+        verify(noticeService).deleteNotice(anyLong(), any(NoticeRequest.class));
     }
 }
