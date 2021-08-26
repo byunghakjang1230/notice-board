@@ -63,4 +63,14 @@ public class Notice {
     public void deleted() {
         this.deleted = true;
     }
+
+    public boolean hasSameOwner(String writer) {
+        return this.writer.equals(writer);
+    }
+
+    public void updateTo(Notice updateNotice) {
+        this.title = updateNotice.title;
+        this.content = updateNotice.content;
+        this.lastModifiedDateTime = LocalDateTime.now();
+    }
 }

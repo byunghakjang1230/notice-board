@@ -19,13 +19,18 @@ public class NoticeRestController {
     }
 
     @PostMapping
-    public ResponseEntity<NoticeResponse> registerNotice(@RequestBody NoticeRequest noticeRequest) {
+    public ResponseEntity<NoticeResponse> saveNoticeByPostMethod(@RequestBody NoticeRequest noticeRequest) {
         NoticeResponse noticeResponse = this.noticeService.saveNotice(noticeRequest);
         return ResponseEntity.created(URI.create("/api/notices/" + noticeResponse.getId())).body(noticeResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NoticeResponse> findNotice(@PathVariable("id") Long id) {
+    public ResponseEntity<NoticeResponse> findNoticeByGetMethod(@PathVariable("id") Long id) {
         return ResponseEntity.ok(this.noticeService.findNoticeBy(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<NoticeResponse> updateNoticeByPutMethod(@PathVariable("id") Long id, @RequestBody NoticeRequest noticeRequest) {
+        return ResponseEntity.ok(this.noticeService.updateNotice(id, noticeRequest));
     }
 }

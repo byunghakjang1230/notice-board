@@ -14,10 +14,7 @@ import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-/**
- * NoticeRepository 테스트 코드 작성
- */
-@DisplayName("NoticeRepository 테스트")
+@DisplayName("NoticeRepository 단위 테스트")
 @DataJpaTest
 class NoticeRepositoryTest {
     @Autowired
@@ -47,7 +44,10 @@ class NoticeRepositoryTest {
                 dynamicTest("삭제되지 않은 공지사항 조회", () -> assertThat(findNotice).isNotEmpty()),
                 dynamicTest("삭제 처리된 공지사항 조회되지 않음", () ->
                         findNotice.ifPresent(notice -> {
+                            // when
                             notice.deleted();
+
+                            // then
                             Optional<Notice> findDeletedNotice = noticeRepository.findByIdAndDeletedIsFalse(notice.getId());
                             assertThat(findDeletedNotice).isEmpty();
                         }))

@@ -1,6 +1,7 @@
 package com.rsupport.notice;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,7 @@ class NoticeAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    @Order(2)
     @DisplayName("등록된 공지사항을 조회한다.")
     void find_notice() {
         // given
@@ -45,6 +47,22 @@ class NoticeAcceptanceTest extends AcceptanceTest {
 
         // then
         공지사항_조회_요청_성공_확인(공지사항_조회_결과);
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("등록된 공지사항을 수정한다.")
+    void modify_notice() {
+        // given
+        NoticeResponse registeredNotice = 공지사항이_등록되어_있음(new NoticeRequest("제목", "내용", "user@email.com"));
+        NoticeRequest noticeModifyRequest = new NoticeRequest("제목1", "내용1", "user@email.com");
+
+        // when
+        ExtractableResponse<Response> 공지사항_수정_결과 = 공지사항_수정_요청(registeredNotice.getId(), noticeModifyRequest);
+
+        // then
+        공지사항_수정_요청_성공_확인(공지사항_수정_결과);
+        공지사항_수정_내용_확인(공지사항_수정_결과.as(NoticeResponse.class), noticeModifyRequest);
     }
 
     private ExtractableResponse<Response> 공지사항_등록_요청(NoticeRequest noticeRequest) {
@@ -68,6 +86,18 @@ class NoticeAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    private ExtractableResponse<Response> 공지사항_수정_요청(Long id, NoticeRequest noticeRequest) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .body(noticeRequest)
+                .put(DEFAULT_URL + "/" + id)
+                .then().log().all()
+                .extract();
+    }
+
     private NoticeResponse 공지사항이_등록되어_있음(NoticeRequest noticeRequest) {
         return 공지사항_등록_요청(noticeRequest).as(NoticeResponse.class);
     }
@@ -77,6 +107,17 @@ class NoticeAcceptanceTest extends AcceptanceTest {
     }
 
     private void 공지사항_조회_요청_성공_확인(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void 공지사항_수정_내용_확인(NoticeResponse resultNoticeResponse, NoticeRequest noticeModifyRequest) {
+        assertAll(
+                () -> assertThat(resultNoticeResponse.getTitle()).isEqualTo(noticeModifyRequest.getTitle()),
+                () -> assertThat(resultNoticeResponse.getContent()).isEqualTo(noticeModifyRequest.getContent())
+        );
+    }
+
+    private void 공지사항_수정_요청_성공_확인(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }

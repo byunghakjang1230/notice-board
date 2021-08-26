@@ -1,6 +1,7 @@
 package com.rsupport.notice.ui;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -21,6 +22,7 @@ import com.rsupport.notice.dto.NoticeResponse;
 import com.rsupport.notice.utils.MockMvcControllerTest;
 
 @WebMvcTest(controllers = NoticeRestController.class)
+@DisplayName("NoticeRestController 단위 테스트")
 class NoticeRestControllerTest extends MockMvcControllerTest {
     private static final String DEFAULT_REQUEST_URL = "/api/notices";
 
@@ -64,6 +66,25 @@ class NoticeRestControllerTest extends MockMvcControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(1L))
+        ;
+    }
+
+    @Test
+    @DisplayName("PUT 수정 요청 정상 완료 확인")
+    void put_update_notice() throws Exception {
+        // given
+        NoticeRequest noticeRequest = new NoticeRequest("제목1", "내용1", "user@email.com");
+        given(noticeService.updateNotice(anyLong(), any(NoticeRequest.class))).willReturn(NoticeResponse.of(1L, "제목1", "내용1", "user@email.com"));
+
+        // when - then
+        this.mockMvc.perform(put(DEFAULT_REQUEST_URL + "/1")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .content(new ObjectMapper().writeValueAsString(noticeRequest)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("title").value(noticeRequest.getTitle()))
+                .andExpect(jsonPath("content").value(noticeRequest.getContent()))
         ;
     }
 }
