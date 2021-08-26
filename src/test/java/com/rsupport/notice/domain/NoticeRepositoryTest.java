@@ -1,6 +1,7 @@
 package com.rsupport.notice.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import java.util.Arrays;
@@ -13,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @DisplayName("NoticeRepository 단위 테스트")
 @DataJpaTest
@@ -52,5 +56,28 @@ class NoticeRepositoryTest {
                             assertThat(findDeletedNotice).isEmpty();
                         }))
         );
+    }
+
+    @Test
+    @DisplayName("공지사항 목록 조회")
+    void find_all_notices() {
+        // given
+        noticeRepository.saveAll(Arrays.asList(new Notice("hi1", "register test1", "user@email.com"),
+                new Notice("hi2", "register test2", "user@email.com"),
+                new Notice("hi3", "register test3", "user@email.com"),
+                new Notice("hi4", "register test4", "user@email.com"),
+                new Notice("hi5", "register test5", "user@email.com")));
+
+        // when
+        Page<Notice> noticePage = this.noticeRepository.findAllByDeletedIsFalse(PageRequest.of(1, 3));
+
+        // then
+        assertAll(
+                () -> assertThat(noticePage.getContent().size()).isEqualTo(2),
+                () -> assertThat(noticePage.getTotalElements()).isEqualTo(5),
+                () -> assertThat(noticePage.getTotalPages()).isEqualTo(2),
+                () -> assertThat(noticePage.getPageable().getPageNumber()).isEqualTo(1)
+        );
+
     }
 }

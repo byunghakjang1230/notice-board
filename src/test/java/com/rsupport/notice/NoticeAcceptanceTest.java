@@ -4,6 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -20,6 +24,19 @@ import io.restassured.response.Response;
 class NoticeAcceptanceTest extends AcceptanceTest {
 
     private static final String DEFAULT_URL = "/api/notices";
+
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        공지사항이_등록되어_있음(new NoticeRequest("제목1", "내용1", "user@email.com"));
+        공지사항이_등록되어_있음(new NoticeRequest("제목2", "내용2", "user@email.com"));
+        공지사항이_등록되어_있음(new NoticeRequest("제목3", "내용3", "user@email.com"));
+        공지사항이_등록되어_있음(new NoticeRequest("제목4", "내용4", "user@email.com"));
+        공지사항이_등록되어_있음(new NoticeRequest("제목5", "내용5", "user@email.com"));
+        공지사항이_등록되어_있음(new NoticeRequest("제목6", "내용6", "user@email.com"));
+        공지사항이_등록되어_있음(new NoticeRequest("제목7", "내용7", "user@email.com"));
+    }
 
     @Test
     @Order(1)
@@ -78,6 +95,31 @@ class NoticeAcceptanceTest extends AcceptanceTest {
 
         // then
         공지사항_삭제_요청_성공_확인(공지사항_삭제_결과);
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("등록된 공지사항 목록을 조회한다.")
+    void find_all_notice_with_paging() {
+        // given
+        int page = 0;
+        int size = 3;
+
+        // when
+        ExtractableResponse<Response> 공지사항_목록_조회_결과 = 공지사항_목록_조회_요청(page, size);
+
+        // then
+        공지사항_목록_조회_요청_성공_확인(공지사항_목록_조회_결과);
+    }
+
+    private ExtractableResponse<Response> 공지사항_목록_조회_요청(int page, int size) {
+        return RestAssured
+                .given().log().all()
+                .when()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .get(DEFAULT_URL + "?page=" + page + "&size=" + size)
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> 공지사항_삭제_요청(Long id, NoticeRequest noticeRequest) {
@@ -149,5 +191,9 @@ class NoticeAcceptanceTest extends AcceptanceTest {
 
     private void 공지사항_삭제_요청_성공_확인(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private void 공지사항_목록_조회_요청_성공_확인(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }

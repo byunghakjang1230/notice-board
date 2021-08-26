@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.rsupport.notice.domain.Notice;
 import com.rsupport.notice.domain.NoticeRepository;
@@ -124,5 +129,19 @@ class NoticeServiceTest {
 
         // then
         verify(this.noticeRepository).delete(any(Notice.class));
+    }
+
+    @Test
+    void notice_findAll_with_paging() {
+        // given
+        Pageable pageable = PageRequest.of(0, 3);
+        Page<Notice> notices = new PageImpl<>(Arrays.asList(new Notice("제목", "내용", "user@email.com")));
+        given(this.noticeRepository.findAllByDeletedIsFalse(pageable)).willReturn(notices);
+
+        // when
+        Page<NoticeResponse> noticeResponsesWithPaging = this.noticeService.findAllNoticesWithPaging(pageable);
+
+        // then
+        assertThat(noticeResponsesWithPaging.getContent()).size().isOne();
     }
 }

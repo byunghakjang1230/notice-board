@@ -2,6 +2,8 @@ package com.rsupport.notice.ui;
 
 import java.net.URI;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,5 +42,10 @@ public class NoticeRestController {
                                                              @RequestBody NoticeRequest noticeRequest) {
         this.noticeService.deleteNotice(id, noticeRequest);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<NoticeResponse>> findAllNoticesByGetMethod(Pageable pageable) {
+        return ResponseEntity.ok(this.noticeService.findAllNoticesWithPaging(pageable));
     }
 }

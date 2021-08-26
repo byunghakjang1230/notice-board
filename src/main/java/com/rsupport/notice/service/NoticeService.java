@@ -1,5 +1,7 @@
 package com.rsupport.notice.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.rsupport.notice.domain.Notice;
@@ -48,5 +50,10 @@ public class NoticeService {
         if (!findNotice.hasSameOwner(writer)) {
             throw new NoticePermissionDeniedException("공지사항 수정 권한이 없습니다.");
         }
+    }
+
+    public Page<NoticeResponse> findAllNoticesWithPaging(Pageable pageable) {
+        return this.noticeRepository.findAllByDeletedIsFalse(pageable)
+                .map(NoticeResponse::of);
     }
 }

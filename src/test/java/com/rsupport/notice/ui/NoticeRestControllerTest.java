@@ -9,11 +9,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -104,5 +110,22 @@ class NoticeRestControllerTest extends MockMvcControllerTest {
                 .andExpect(status().isNoContent())
         ;
         verify(noticeService).deleteNotice(anyLong(), any(NoticeRequest.class));
+    }
+
+    @Test
+    @DisplayName("GET 페이징 처리 목록조회 요청 정상 완료 확인")
+    void get_findAll_notice_with_paging() throws Exception {
+        // given
+        NoticeRequest noticeRequest = new NoticeRequest("제목", "내용", "user@email.com");
+        Pageable pageable = PageRequest.of(0, 3);
+        Page<NoticeResponse> notices = new PageImpl<>(Arrays.asList(NoticeResponse.of(noticeRequest.toNotice())));
+        given(this.noticeService.findAllNoticesWithPaging(pageable)).willReturn(notices);
+
+        // when - then
+        this.mockMvc.perform(get(DEFAULT_REQUEST_URL + "?size=3"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content.length()").value(1))
+        ;
     }
 }
