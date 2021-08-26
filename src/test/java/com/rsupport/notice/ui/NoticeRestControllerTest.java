@@ -51,4 +51,19 @@ class NoticeRestControllerTest extends MockMvcControllerTest {
                 .andExpect(jsonPath("id").value(1L))
         ;
     }
+
+    @Test
+    @DisplayName("GET 조회 요청 정상 조회 확인")
+    void get_find_notice() throws Exception {
+        // given
+        NoticeResponse noticeResponse = NoticeResponse.of(1L, "제목", "내용", "user@email.com");
+        given(this.noticeService.findNoticeBy(1L)).willReturn(noticeResponse);
+
+        // when - then
+        this.mockMvc.perform(get(DEFAULT_REQUEST_URL + "/1"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(1L))
+        ;
+    }
 }

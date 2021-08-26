@@ -23,4 +23,9 @@ public class NoticeRestController {
         NoticeResponse noticeResponse = this.noticeService.saveNotice(noticeRequest);
         return ResponseEntity.created(URI.create("/api/notices/" + noticeResponse.getId())).body(noticeResponse);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<NoticeResponse> findNotice(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(this.noticeService.findNoticeBy(id));
+    }
 }
