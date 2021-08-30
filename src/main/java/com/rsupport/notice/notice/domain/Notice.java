@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 import javax.persistence.*;
 
+import com.rsupport.notice.member.domain.Member;
+
 @Entity
 public class Notice {
     @Id
@@ -15,8 +17,9 @@ public class Notice {
     @Lob
     @Column(nullable = false)
     private String content;
-    @Column(nullable = false)
-    private String writer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "writer_id", nullable = false)
+    private Member writer;
     @Column(name = "create_date_time")
     private LocalDateTime createDateTime;
     @Column(name = "last_modified_date_time")
@@ -27,7 +30,16 @@ public class Notice {
     protected Notice() {
     }
 
-    public Notice(String title, String content, String writer) {
+    public Notice(String title, String content) {
+        this.title = title;
+        this.content = content;
+        this.writer = null;
+        this.createDateTime = LocalDateTime.now();
+        this.lastModifiedDateTime = LocalDateTime.now();
+        this.deleted = false;
+    }
+
+    public Notice(String title, String content, Member writer) {
         this.title = title;
         this.content = content;
         this.writer = writer;
@@ -48,7 +60,7 @@ public class Notice {
         return content;
     }
 
-    public String getWriter() {
+    public Member getWriter() {
         return writer;
     }
 
@@ -64,7 +76,7 @@ public class Notice {
         this.deleted = true;
     }
 
-    public boolean hasSameOwner(String writer) {
+    public boolean hasSameOwner(Member writer) {
         return this.writer.equals(writer);
     }
 

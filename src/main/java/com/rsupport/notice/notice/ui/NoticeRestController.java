@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.rsupport.notice.auth.domain.AuthenticationPrincipal;
+import com.rsupport.notice.auth.domain.LoginUser;
 import com.rsupport.notice.notice.service.NoticeService;
 import com.rsupport.notice.notice.dto.NoticeRequest;
 import com.rsupport.notice.notice.dto.NoticeResponse;
@@ -21,26 +23,29 @@ public class NoticeRestController {
     }
 
     @PostMapping
-    public ResponseEntity<NoticeResponse> saveNoticeByPostMethod(@RequestBody NoticeRequest noticeRequest) {
-        NoticeResponse noticeResponse = this.noticeService.saveNotice(noticeRequest);
+    public ResponseEntity<NoticeResponse> saveNoticeByPostMethod(@AuthenticationPrincipal LoginUser loginUser,
+                                                                 @RequestBody NoticeRequest noticeRequest) {
+        NoticeResponse noticeResponse = this.noticeService.saveNotice(noticeRequest, loginUser);
         return ResponseEntity.created(URI.create("/api/notices/" + noticeResponse.getId())).body(noticeResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NoticeResponse> findNoticeByGetMethod(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.noticeService.findNoticeBy(id));
+    public ResponseEntity<NoticeResponse> findNoticeByGetMethod(@AuthenticationPrincipal LoginUser loginUser,
+                                                                @PathVariable("id") Long id) {
+        return ResponseEntity.ok(this.noticeService.findNoticeBy(id, loginUser));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NoticeResponse> updateNoticeByPutMethod(@PathVariable("id") Long id,
+    public ResponseEntity<NoticeResponse> updateNoticeByPutMethod(@AuthenticationPrincipal LoginUser loginUser,
+                                                                  @PathVariable("id") Long id,
                                                                   @RequestBody NoticeRequest noticeRequest) {
-        return ResponseEntity.ok(this.noticeService.updateNotice(id, noticeRequest));
+        return ResponseEntity.ok(this.noticeService.updateNotice(id, noticeRequest, loginUser));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteNoticeByDeleteMethod(@PathVariable("id") Long id,
-                                                             @RequestBody NoticeRequest noticeRequest) {
-        this.noticeService.deleteNotice(id, noticeRequest);
+    public ResponseEntity<String> deleteNoticeByDeleteMethod(@AuthenticationPrincipal LoginUser loginUser,
+                                                             @PathVariable("id") Long id) {
+        this.noticeService.deleteNotice(id, loginUser);
         return ResponseEntity.noContent().build();
     }
 
