@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import com.rsupport.notice.member.MemberAcceptanceTest;
+import com.rsupport.notice.common.dto.ErrorResponse;
 import com.rsupport.notice.notice.dto.NoticeRequest;
 import com.rsupport.notice.notice.dto.NoticeResponse;
 import com.rsupport.notice.utils.AcceptanceTest;
@@ -18,18 +18,21 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 @DisplayName("공지사항 등록/수정/조회 통합 테스트")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class NoticeAcceptanceTest extends AcceptanceTest {
     private static final String DEFAULT_URL = "/api/notices";
-//    private static final String USER_TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQGVtYWlsLmNvbSIsImlhdCI6MTYzMDMyMTIzOCwiZXhwIjoxNjMwMzI0ODM4fQ.ZzjecJe_SUnzlqayHNg1V31xTC8l4eVeYncN-WhBpR4";
     private String loginToken;
+    private String loginToken1;
 
     @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
-        회원이_등록되어_있음_공개(MemberAcceptanceTest.USER_EMAIL, "123");
-        loginToken = "Bearer " + 회원_로그인_되어있음_공개(USER_EMAIL, "123");
+        회원이_등록되어_있음_공개(USER_EMAIL_A, "123");
+        회원이_등록되어_있음_공개(USER_EMAIL_B, "123");
+        loginToken = "Bearer " + 회원_로그인_되어있음_공개(USER_EMAIL_A, "123");
+        loginToken1 = "Bearer " + 회원_로그인_되어있음_공개(USER_EMAIL_B, "123");
+        System.out.println(loginToken);
+        System.out.println(loginToken1);
         공지사항이_등록되어_있음(new NoticeRequest("제목1", "내용1"));
         공지사항이_등록되어_있음(new NoticeRequest("제목2", "내용2"));
         공지사항이_등록되어_있음(new NoticeRequest("제목3", "내용3"));
@@ -40,7 +43,6 @@ class NoticeAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @Order(1)
     @DisplayName("공지사항을 등록한다.")
     void save_notice() {
         // given
@@ -54,7 +56,6 @@ class NoticeAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @Order(2)
     @DisplayName("등록된 공지사항을 조회한다.")
     void find_notice() {
         // given
@@ -68,7 +69,6 @@ class NoticeAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @Order(3)
     @DisplayName("등록된 공지사항을 수정한다.")
     void modify_notice() {
         // given
@@ -76,7 +76,7 @@ class NoticeAcceptanceTest extends AcceptanceTest {
         NoticeRequest noticeModifyRequest = new NoticeRequest("제목1", "내용1");
 
         // when
-        ExtractableResponse<Response> 공지사항_수정_결과 = 공지사항_수정_요청(registeredNotice.getId(), noticeModifyRequest);
+        ExtractableResponse<Response> 공지사항_수정_결과 = 공지사항_수정_요청(registeredNotice.getId(), noticeModifyRequest, loginToken);
 
         // then
         공지사항_수정_요청_성공_확인(공지사항_수정_결과);
@@ -84,7 +84,6 @@ class NoticeAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @Order(4)
     @DisplayName("등록된 공지사항을 삭제한다.")
     void delete_notice() {
         // given
@@ -92,14 +91,13 @@ class NoticeAcceptanceTest extends AcceptanceTest {
         NoticeRequest noticeModifyRequest = new NoticeRequest("제목", "내용");
 
         // when
-        ExtractableResponse<Response> 공지사항_삭제_결과 = 공지사항_삭제_요청(registeredNotice.getId(), noticeModifyRequest);
+        ExtractableResponse<Response> 공지사항_삭제_결과 = 공지사항_삭제_요청(registeredNotice.getId(), noticeModifyRequest, loginToken);
 
         // then
         공지사항_삭제_요청_성공_확인(공지사항_삭제_결과);
     }
 
     @Test
-    @Order(5)
     @DisplayName("등록된 공지사항 목록을 조회한다.")
     void find_all_notice_with_paging() {
         // given
@@ -113,6 +111,63 @@ class NoticeAcceptanceTest extends AcceptanceTest {
         공지사항_목록_조회_요청_성공_확인(공지사항_목록_조회_결과);
     }
 
+    @Test
+    @DisplayName("공지사항 조회 실패 오류발생")
+    void find_notice_notFount_exception() {
+        // when
+        ExtractableResponse<Response> 공지사항_조회_결과 = 공지사항_조회_요청(100L);
+
+        // then
+        공지사항_조회_요청_실패_확인(공지사항_조회_결과);
+        요청실패_메시지_확인(공지사항_조회_결과.as(ErrorResponse.class), "요청한 공지사항이 없습니다.");
+    }
+
+    @Test
+    @DisplayName("공지사항 수정 권한 없음으로 실패 오류 발생")
+    void update_notice_fail_exception() {
+        // given
+        NoticeResponse registeredNotice = 공지사항이_등록되어_있음(new NoticeRequest("제목", "내용"));
+        NoticeRequest noticeModifyRequest = new NoticeRequest("제목1", "내용1");
+
+        // when
+        ExtractableResponse<Response> 공지사항_수정_결과 = 공지사항_수정_요청(registeredNotice.getId(), noticeModifyRequest, loginToken1);
+
+        // then
+        공지사항_수정_요청_실패_확인(공지사항_수정_결과);
+        요청실패_메시지_확인(공지사항_수정_결과.as(ErrorResponse.class), "공지사항에 대한 변경 권한이 없습니다.");
+    }
+
+    @Test
+    @DisplayName("공지사항 삭제 권한 없음으로 실패 오류 발생")
+    void delete_notice_fail_exception() {
+        // given
+        NoticeResponse registeredNotice = 공지사항이_등록되어_있음(new NoticeRequest("제목", "내용"));
+        NoticeRequest noticeModifyRequest = new NoticeRequest("제목", "내용");
+
+        // when
+        ExtractableResponse<Response> 공지사항_삭제_결과 = 공지사항_삭제_요청(registeredNotice.getId(), noticeModifyRequest, loginToken1);
+
+        // then
+        공지사항_삭제_요청_실패_확인(공지사항_삭제_결과);
+        요청실패_메시지_확인(공지사항_삭제_결과.as(ErrorResponse.class), "공지사항에 대한 변경 권한이 없습니다.");
+    }
+
+    private void 공지사항_삭제_요청_실패_확인(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void 공지사항_수정_요청_실패_확인(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void 요청실패_메시지_확인(ErrorResponse errorResponse, String errorMessage) {
+        assertThat(errorResponse.getErrorMessage()).isEqualTo(errorMessage);
+    }
+
+    private void 공지사항_조회_요청_실패_확인(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     private ExtractableResponse<Response> 공지사항_목록_조회_요청(int page, int size) {
         return RestAssured
                 .given().log().all()
@@ -123,7 +178,7 @@ class NoticeAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 공지사항_삭제_요청(Long id, NoticeRequest noticeRequest) {
+    private ExtractableResponse<Response> 공지사항_삭제_요청(Long id, NoticeRequest noticeRequest, String loginToken) {
         return RestAssured
                 .given().log().all()
                 .when()
@@ -158,7 +213,7 @@ class NoticeAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
-    private ExtractableResponse<Response> 공지사항_수정_요청(Long id, NoticeRequest noticeRequest) {
+    private ExtractableResponse<Response> 공지사항_수정_요청(Long id, NoticeRequest noticeRequest, String loginToken) {
         return RestAssured
                 .given().log().all()
                 .when()

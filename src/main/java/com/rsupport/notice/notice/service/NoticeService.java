@@ -26,10 +26,10 @@ public class NoticeService {
     }
 
     public NoticeResponse saveNotice(NoticeRequest noticeRequest, LoginUser loginUser) {
-        Member member = findMemberByLoginUserOrExceptionWithMessage(loginUser, "등록 권한이 없습니다.");
+        Member findUser = findMemberByLoginUserOrExceptionWithMessage(loginUser, "등록 권한이 없습니다.");
         Notice savedNotice =
-                this.noticeRepository.save(new Notice(noticeRequest.getTitle(), noticeRequest.getContent(), member));
-        return NoticeResponse.of(savedNotice, savedNotice.hasSameOwner(member));
+                this.noticeRepository.save(new Notice(noticeRequest.getTitle(), noticeRequest.getContent(), findUser));
+        return NoticeResponse.of(savedNotice, savedNotice.hasSameOwner(findUser));
     }
 
     public NoticeResponse findNoticeBy(Long id, LoginUser loginUser) {
@@ -70,7 +70,7 @@ public class NoticeService {
 
     private void validateNoticePermission(Notice findNotice, Member writer) {
         if (!findNotice.hasSameOwner(writer)) {
-            throw new NoticePermissionDeniedException("공지사항 수정 권한이 없습니다.");
+            throw new NoticePermissionDeniedException("공지사항에 대한 변경 권한이 없습니다.");
         }
     }
 }

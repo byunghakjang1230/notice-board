@@ -135,7 +135,7 @@ class NoticeServiceTest {
                 this.noticeService.updateNotice(1L,
                         new NoticeRequest("제목1", "내용1"), new LoginUser(1L, "user@email.com")))
                 .isInstanceOf(NoticePermissionDeniedException.class)
-                .hasMessage("공지사항 수정 권한이 없습니다.");
+                .hasMessage("공지사항에 대한 변경 권한이 없습니다.");
     }
 
     @Test

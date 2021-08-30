@@ -17,6 +17,8 @@ public class Member {
     }
 
     public Member(String email, String password) {
+        validateEmailIsNullOrEmpty(email);
+        validatePasswordIsNullOrEmpty(password);
         this.email = email;
         this.password = password;
     }
@@ -50,5 +52,17 @@ public class Member {
     @Override
     public int hashCode() {
         return Objects.hash(id, email, password);
+    }
+
+    private void validateEmailIsNullOrEmpty(String email) {
+        if (Objects.isNull(email) || email.isEmpty()) {
+            throw new IllegalArgumentException("Email이 Null이거나 Empty입니다.");
+        }
+    }
+
+    private void validatePasswordIsNullOrEmpty(String password) {
+        if (Objects.isNull(password) || password.isEmpty()) {
+            throw new IllegalArgumentException("Password가 Null이거나 Empty입니다.");
+        }
     }
 }

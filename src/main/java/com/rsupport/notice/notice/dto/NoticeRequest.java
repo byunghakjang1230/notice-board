@@ -23,6 +23,6 @@ public class NoticeRequest {
     }
 
     public Notice toUpdateNotice() {
-        return new Notice(this.title, this.content);
+        return Notice.createForUpdate(this.title, this.content);
     }
 }

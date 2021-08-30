@@ -2,6 +2,7 @@ package com.rsupport.notice.notice.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import javax.persistence.*;
 
@@ -30,22 +31,27 @@ public class Notice {
     protected Notice() {
     }
 
-    public Notice(String title, String content) {
+    private Notice(String title, String content) {
+        validateTitleIsNullOrEmpty(title);
+        validateContentIsNullOrEmpty(content);
         this.title = title;
         this.content = content;
-        this.writer = null;
-        this.createDateTime = LocalDateTime.now();
-        this.lastModifiedDateTime = LocalDateTime.now();
-        this.deleted = false;
     }
 
     public Notice(String title, String content, Member writer) {
+        validateTitleIsNullOrEmpty(title);
+        validateContentIsNullOrEmpty(content);
+        validateWriterIsNull(writer);
         this.title = title;
         this.content = content;
         this.writer = writer;
         this.createDateTime = LocalDateTime.now();
         this.lastModifiedDateTime = LocalDateTime.now();
         this.deleted = false;
+    }
+
+    public static Notice createForUpdate(String title, String content) {
+        return new Notice(title, content);
     }
 
     public Long getId() {
@@ -84,5 +90,23 @@ public class Notice {
         this.title = updateNotice.title;
         this.content = updateNotice.content;
         this.lastModifiedDateTime = LocalDateTime.now();
+    }
+
+    private void validateTitleIsNullOrEmpty(String title) {
+        if (Objects.isNull(title) || title.isEmpty()) {
+            throw new IllegalArgumentException("Title이 Null 또는 Empty입니다.");
+        }
+    }
+
+    private void validateContentIsNullOrEmpty(String content) {
+        if (Objects.isNull(content) || content.isEmpty()) {
+            throw new IllegalArgumentException("Content가 Null 또는 Empty입니다.");
+        }
+    }
+
+    private void validateWriterIsNull(Member writer) {
+        if (Objects.isNull(writer)) {
+            throw new IllegalArgumentException("Writer가 Null입니다.");
+        }
     }
 }
