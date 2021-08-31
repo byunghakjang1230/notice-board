@@ -11,6 +11,7 @@ const Navigae = () => {
   const onClickLogOut = () => {
     loginService.logOut();
     setLogin(false);
+    alert("로그아웃 처리 되었습니다.");
   };
 
   return (

@@ -38,8 +38,13 @@ const Join = ({ history }) => {
     }
     const joinData = { email: join.email, password: join.password };
     const data = service.join(joinData);
-    data.then((value) => {
-      history.push("/login");
+    data.then((result) => {
+      if (result.status === 201) {
+        alert("회원가입이 되었습니다.");
+        history.push("/login");
+        return;
+      }
+      alert(result.status + " - 오류 메시지 : " + result.data.errorMessage);
     });
   };
   const onChangeEmail = (e) => {

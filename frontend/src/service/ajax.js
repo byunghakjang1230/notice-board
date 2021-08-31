@@ -3,14 +3,24 @@ import * as cookie from "../utils/Cookies";
 
 const defaultUrl = "http://localhost:3000/api";
 
+const validateStatus = (status) => {
+  return status < 500;
+};
+
 export function getMethod(path) {
   const headers = getHeader();
-  return axios.get(defaultUrl + path, { headers });
+  return axios.get(defaultUrl + path, {
+    headers,
+    validateStatus: validateStatus(),
+  });
 }
 
 export function postMethod(path, data) {
   const headers = getHeader();
-  return axios.post(defaultUrl + path, data, { headers });
+  return axios.post(defaultUrl + path, data, {
+    headers,
+    validateStatus: validateStatus(),
+  });
 }
 
 export function deleteMethod(path) {

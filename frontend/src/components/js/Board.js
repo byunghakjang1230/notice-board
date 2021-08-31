@@ -26,20 +26,24 @@ class Board extends Component {
 
   componentDidMount() {
     const defaultData = service.getPagingNotices(DEFAULT_PAGE_NUMBER);
-    defaultData.then((value) => {
-      const data = value.data;
-      this.setState({
-        data: data.content.map((content) => {
-          return createData(
-            content.id,
-            content.writer.email,
-            content.title,
-            content.createDateTime
-          );
-        }),
-        currentPage: data.number,
-        totalPages: data.totalPages,
-      });
+    defaultData.then((result) => {
+      if (result.status === 200) {
+        const data = result.data;
+        this.setState({
+          data: data.content.map((content) => {
+            return createData(
+              content.id,
+              content.writer.email,
+              content.title,
+              content.createDateTime
+            );
+          }),
+          currentPage: data.number,
+          totalPages: data.totalPages,
+        });
+        return;
+      }
+      alert(result.status + " - 오류 메시지 : " + result.data.errorMessage);
     });
   }
 
