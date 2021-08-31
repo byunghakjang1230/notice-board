@@ -1,5 +1,41 @@
 # 공지사항 웹 어플리케이션 구현
 
+## 어플리케이션 실행
+- 프로젝트 Root경로 기준.
+### Install
+```shell
+$ cd frontend
+$ npm install
+```
+### 실행
+#### React server 구동
+```shell
+$ cd frontend
+$ npm start
+```
+#### application 구동
+```shell
+$ ./gradlew bootRun
+```
+### 웹 페이지 접속
+- http://localhost:3000/
+
+### API 명세
+|기능|Methods|URL|
+|---|---|---|
+|회원가입|POST|/api/members|
+|로그인|POST|/api/login|
+|공지사항 등록|POST|/api/notices|
+|공지사항 단건 조회|GET|/api/notices/{id}|
+|공지사항 수정|PUT|/api/notices/{id}|
+|공지사항 삭제|DELETE|/api/notices/{id}|
+|공지사항 목록조회|GET|/api/notices?page={page}&size={size}|
+
+### 참고 내용.
+- 어플리케이션 실행 시 테스트용 더미 데이터 등록.
+    + 사용자 - email:`user@email.com`, pw:`123`
+    + 공지사항 - 130건
+
 ## 기능
 
 - 사용자는 텍스트로 된 공지를 추가할 수 있다.
