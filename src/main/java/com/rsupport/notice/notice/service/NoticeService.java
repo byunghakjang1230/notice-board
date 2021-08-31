@@ -3,6 +3,7 @@ package com.rsupport.notice.notice.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rsupport.notice.auth.domain.LoginUser;
 import com.rsupport.notice.auth.exception.AuthorizationException;
@@ -16,6 +17,7 @@ import com.rsupport.notice.notice.exception.NoticeNotFoundException;
 import com.rsupport.notice.notice.exception.NoticePermissionDeniedException;
 
 @Service
+@Transactional
 public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final MemberRepository memberRepository;
@@ -33,7 +35,7 @@ public class NoticeService {
     }
 
     public NoticeResponse findNoticeBy(Long id, LoginUser loginUser) {
-        Member findUser = findMemberByLoginUserOrExceptionWithMessage(loginUser, "사용자 조회에 실패하였습니다.");
+        Member findUser = findMemberByLoginUserOrGuestMember(loginUser);
         Notice findNotice = findNoticeByIdOrException(id);
         return NoticeResponse.of(findNotice, findNotice.hasSameOwner(findUser));
     }
@@ -54,8 +56,16 @@ public class NoticeService {
     }
 
     public Page<NoticeResponse> findAllNoticesWithPaging(Pageable pageable) {
-        return this.noticeRepository.findAllByDeletedIsFalse(pageable)
+        return this.noticeRepository.findAllByDeletedIsFalseOrderByIdDesc(pageable)
                 .map(NoticeResponse::of);
+    }
+
+    private Member findMemberByLoginUserOrGuestMember(LoginUser loginUser) {
+        if (loginUser.isGuestUser()) {
+            return Member.createGuestMember();
+        }
+        return this.memberRepository.findById(loginUser.getId())
+                .orElse(Member.createGuestMember());
     }
 
     private Member findMemberByLoginUserOrExceptionWithMessage(LoginUser loginUser, String exceptionMessage) {

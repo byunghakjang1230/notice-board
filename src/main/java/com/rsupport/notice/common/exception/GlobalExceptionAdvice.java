@@ -2,6 +2,7 @@ package com.rsupport.notice.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -26,7 +27,7 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(NoticeNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlingNoticeNotFoundException(NoticeNotFoundException exception) {
-        return ResponseEntity.badRequest().body(ErrorResponse.of(HttpStatus.BAD_REQUEST, exception.getMessage()));
+        return ResponseEntity.badRequest().body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, exception.getMessage()));
     }
 
     @ExceptionHandler(NoticePermissionDeniedException.class)
@@ -34,13 +35,15 @@ public class GlobalExceptionAdvice {
         return ResponseEntity.badRequest().body(ErrorResponse.of(HttpStatus.BAD_REQUEST, exception.getMessage()));
     }
 
+    @CrossOrigin("*")
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<ErrorResponse> handlingAuthorizationException(AuthorizationException exception) {
-        return ResponseEntity.badRequest().body(ErrorResponse.of(HttpStatus.BAD_REQUEST, exception.getMessage()));
+        return ResponseEntity.badRequest().body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, exception.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handlingException() {
+    public ResponseEntity<ErrorResponse> handlingException(Exception exception) {
+        exception.printStackTrace();
         return ResponseEntity.badRequest().body(ErrorResponse.of(HttpStatus.BAD_REQUEST));
     }
 }

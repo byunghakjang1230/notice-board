@@ -1,6 +1,9 @@
 package com.rsupport.notice.auth.service;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rsupport.notice.auth.domain.LoginUser;
 import com.rsupport.notice.auth.dto.LoginRequest;
@@ -12,6 +15,7 @@ import com.rsupport.notice.member.domain.MemberRepository;
 import com.rsupport.notice.member.exception.MemberNotFoundException;
 
 @Service
+@Transactional
 public class AuthService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -27,15 +31,18 @@ public class AuthService {
         return new LoginResponse(jwtTokenProvider.createToken(loginRequest.getEmail()));
     }
 
+    public LoginUser findMemberByToken(String token) {
+        if (Objects.isNull(token) || token.isEmpty()) {
+            return new LoginUser();
+        }
+        String email = jwtTokenProvider.getEmailBy(token);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        return new LoginUser(member.getId(), member.getEmail());
+    }
+
     private void validateMatchedPassword(Member member, LoginRequest loginRequest) {
         if(!member.checkPassword(loginRequest.getPassword())){
             throw new AuthorizationException("비밀변호가 맞지 않습니다.");
         }
-    }
-
-    public LoginUser findMemberByToken(String token) {
-        String email = jwtTokenProvider.getEmailBy(token);
-        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
-        return new LoginUser(member.getId(), member.getEmail());
     }
 }

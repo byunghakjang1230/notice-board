@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
     Optional<Notice> findByIdAndDeletedIsFalse(Long id);
     Page<Notice> findAllByDeletedIsFalse(Pageable pageable);
+    Page<Notice> findAllByDeletedIsFalseOrderByIdDesc(Pageable pageable);
 }

@@ -70,7 +70,7 @@ class NoticeServiceTest {
         Notice notice = new Notice("제목", "내용", member);
         given(noticeRepository.findByIdAndDeletedIsFalse(anyLong()))
                 .willReturn(Optional.of(notice));
-        given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(member));
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
 
         // when
         NoticeResponse findNotice = this.noticeService.findNoticeBy(1L, new LoginUser(1L, "user@email.com"));
@@ -89,12 +89,28 @@ class NoticeServiceTest {
         Member member = new Member("user@email.com", "123");
         given(noticeRepository.findByIdAndDeletedIsFalse(anyLong()))
                 .willReturn(Optional.empty());
-        given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(member));
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
 
         // when - then
         assertThatThrownBy(() -> this.noticeService.findNoticeBy(1L, new LoginUser(1L, "user@email.com")))
                 .isInstanceOf(NoticeNotFoundException.class)
                 .hasMessage("요청한 공지사항이 없습니다.");
+    }
+
+    @Test
+    @DisplayName("게스트 공지사항 단건 조회 수정권한 없음 확인")
+    void notice_find_guest() {
+        // given
+        Member member = new Member("user@email.com", "123");
+        given(noticeRepository.findByIdAndDeletedIsFalse(anyLong()))
+                .willReturn(Optional.of(new Notice("title", "content", member)));
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(Member.createGuestMember()));
+
+        // when
+        NoticeResponse noticeResponse = this.noticeService.findNoticeBy(1L, new LoginUser(1L, "user@email.com"));
+
+        // then
+        assertThat(noticeResponse.isEditable()).isFalse();
     }
 
     @Test
@@ -162,7 +178,7 @@ class NoticeServiceTest {
         Member member = new Member("user@email.com", "123");
         Pageable pageable = PageRequest.of(0, 3);
         Page<Notice> notices = new PageImpl<>(Arrays.asList(new Notice("제목", "내용", member)));
-        given(this.noticeRepository.findAllByDeletedIsFalse(pageable)).willReturn(notices);
+        given(this.noticeRepository.findAllByDeletedIsFalseOrderByIdDesc(pageable)).willReturn(notices);
 
         // when
         Page<NoticeResponse> noticeResponsesWithPaging = this.noticeService.findAllNoticesWithPaging(pageable);

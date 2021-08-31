@@ -1,6 +1,7 @@
 package com.rsupport.notice.member.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rsupport.notice.member.domain.Member;
 import com.rsupport.notice.member.domain.MemberRepository;
@@ -9,6 +10,7 @@ import com.rsupport.notice.member.dto.MemberResponse;
 import com.rsupport.notice.member.exception.EmailExistsException;
 
 @Service
+@Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
 

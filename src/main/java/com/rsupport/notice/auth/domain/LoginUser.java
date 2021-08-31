@@ -22,6 +22,10 @@ public class LoginUser {
         return email;
     }
 
+    public boolean isGuestUser() {
+        return Objects.isNull(this.id);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

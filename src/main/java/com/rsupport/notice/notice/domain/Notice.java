@@ -1,6 +1,5 @@
 package com.rsupport.notice.notice.domain;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -70,12 +69,12 @@ public class Notice {
         return writer;
     }
 
-    public LocalDate getCreateDate() {
-        return this.createDateTime.toLocalDate();
+    public LocalDateTime getCreateDateTime() {
+        return createDateTime;
     }
 
-    public LocalDate getLastModifiedDate() {
-        return this.lastModifiedDateTime.toLocalDate();
+    public LocalDateTime getLastModifiedDateTime() {
+        return lastModifiedDateTime;
     }
 
     public void deleted() {

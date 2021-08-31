@@ -1,32 +1,33 @@
 package com.rsupport.notice.notice.dto;
 
-import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import com.rsupport.notice.member.domain.Member;
 import com.rsupport.notice.member.dto.MemberResponse;
 import com.rsupport.notice.notice.domain.Notice;
 
 public class NoticeResponse {
+    private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private Long id;
     private String title;
     private String content;
     private MemberResponse writer;
     private boolean editable;
-    private LocalDate createDate;
-    private LocalDate lastModifiedDate;
+    private String createDateTime;
+    private String lastModifiedDateTime;
 
     protected NoticeResponse() {
     }
 
     private NoticeResponse(Long id, String title, String content, MemberResponse writer, boolean editable,
-                           LocalDate createDate, LocalDate lastModifiedDate) {
+                           String createDateTime, String lastModifiedDateTime) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.writer = writer;
         this.editable = editable;
-        this.createDate = createDate;
-        this.lastModifiedDate = lastModifiedDate;
+        this.createDateTime = createDateTime;
+        this.lastModifiedDateTime = lastModifiedDateTime;
     }
 
     public static NoticeResponse of(Long id, String title, String content, Member writer, boolean editable) {
@@ -35,12 +36,16 @@ public class NoticeResponse {
 
     public static NoticeResponse of(Notice notice) {
         return new NoticeResponse(notice.getId(), notice.getTitle(), notice.getContent(),
-                MemberResponse.of(notice.getWriter()), false, notice.getCreateDate(), notice.getLastModifiedDate());
+                MemberResponse.of(notice.getWriter()), false,
+                notice.getCreateDateTime().format(DateTimeFormatter.ofPattern(DATETIME_FORMAT)),
+                notice.getLastModifiedDateTime().format(DateTimeFormatter.ofPattern(DATETIME_FORMAT)));
     }
 
     public static NoticeResponse of(Notice notice, boolean editable) {
         return new NoticeResponse(notice.getId(), notice.getTitle(), notice.getContent(),
-                MemberResponse.of(notice.getWriter()), editable, notice.getCreateDate(), notice.getLastModifiedDate());
+                MemberResponse.of(notice.getWriter()), editable,
+                notice.getCreateDateTime().format(DateTimeFormatter.ofPattern(DATETIME_FORMAT)),
+                notice.getLastModifiedDateTime().format(DateTimeFormatter.ofPattern(DATETIME_FORMAT)));
     }
 
     public Long getId() {
@@ -59,11 +64,15 @@ public class NoticeResponse {
         return writer;
     }
 
-    public LocalDate getCreateDate() {
-        return createDate;
+    public String getCreateDateTime() {
+        return createDateTime;
     }
 
-    public LocalDate getLastModifiedDate() {
-        return lastModifiedDate;
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public String getLastModifiedDateTime() {
+        return lastModifiedDateTime;
     }
 }

@@ -23,6 +23,10 @@ public class Member {
         this.password = password;
     }
 
+    public static Member createGuestMember(){
+        return new Member();
+    }
+
     public Long getId() {
         return id;
     }
