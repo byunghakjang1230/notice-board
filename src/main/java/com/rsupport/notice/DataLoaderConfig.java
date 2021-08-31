@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.rsupport.notice.member.domain.Member;
@@ -12,6 +13,7 @@ import com.rsupport.notice.notice.domain.Notice;
 import com.rsupport.notice.notice.domain.NoticeRepository;
 
 @Component
+@Profile("!test")
 public class DataLoaderConfig implements CommandLineRunner {
     private final MemberRepository memberRepository;
     private final NoticeRepository noticeRepository;
@@ -22,7 +24,7 @@ public class DataLoaderConfig implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         Member member = memberRepository.save(new Member("user@email.com", "123"));
         List<Notice> notices = new ArrayList<>();
         for (int i = 1; i <= 130; i++) {
