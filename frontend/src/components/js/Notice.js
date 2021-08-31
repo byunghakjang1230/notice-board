@@ -43,22 +43,27 @@ class Notice extends Component {
   }
 
   readData() {
-    service.findNotice(this.state.id).then((value) => {
-      const data = value.data;
-      if (data !== undefined) {
-        this.setState({
-          id: data.id,
-          data: data,
-          create: false,
-          buttonReadOnly: {
-            modifying: !data.editable,
-            saving: true,
-          },
-          inputReadOnly: true,
-          titleValue: data.title,
-          contentValue: data.content,
-        });
+    service.findNotice(this.state.id).then((result) => {
+      if (result.status === 200) {
+        const data = result.data;
+        if (data !== undefined) {
+          this.setState({
+            id: data.id,
+            data: data,
+            create: false,
+            buttonReadOnly: {
+              modifying: !data.editable,
+              saving: true,
+            },
+            inputReadOnly: true,
+            titleValue: data.title,
+            contentValue: data.content,
+          });
+        }
+        return;
       }
+      alert(result.status + " - 오류 메시지 : " + result.data.errorMessage);
+      this.state.history.push("/");
     });
   }
 
@@ -105,6 +110,22 @@ class Notice extends Component {
     };
 
     const eventSaveClick = () => {
+      if (
+        this.state.titleValue === undefined ||
+        this.state.titleValue === null ||
+        this.state.titleValue === ""
+      ) {
+        alert("제목은 필수 입력 항목입니다.");
+        return;
+      }
+      if (
+        this.state.contentValue === undefined ||
+        this.state.contentValue === null ||
+        this.state.contentValue === ""
+      ) {
+        alert("내용은 필수 입력 항목입니다.");
+        return;
+      }
       const saveData = {
         title: this.state.titleValue,
         content: this.state.contentValue,
@@ -125,14 +146,23 @@ class Notice extends Component {
     };
 
     const saveService = (data) => {
-      service.saveNotice(data).then((value) => {
-        this.state.history.push("/");
+      service.saveNotice(data).then((result) => {
+        if (result.status === 201) {
+          alert("정상 처리되었습니다.");
+          this.state.history.push("/");
+          return;
+        }
+        alert(result.status + " - 오류 메시지 : " + result.data.errorMessage);
       });
     };
 
     const updateService = (id, data) => {
+      if (!window.confirm("수정하시겠습니까?")) {
+        return;
+      }
       service.updateNotice(id, data).then((result) => {
         if (result.status === 200) {
+          alert("정상 처리되었습니다.");
           const data = result.data;
           if (data !== undefined) {
             this.setState({
@@ -149,7 +179,9 @@ class Notice extends Component {
             });
           }
           changeReadOnlyStatus(false, true, true);
+          return;
         }
+        alert(result.status + " - 오류 메시지 : " + result.data.errorMessage);
       });
     };
 
@@ -158,11 +190,17 @@ class Notice extends Component {
     };
 
     const eventDeleteClick = () => {
-      if (window.confirm("삭제하시겠습니까?")) {
-        service.deleteNotice(this.state.id).then((result) => {
-          this.state.history.push("/");
-        });
+      if (!window.confirm("삭제하시겠습니까?")) {
+        return;
       }
+      service.deleteNotice(this.state.id).then((result) => {
+        if (result.status === 204) {
+          alert("정상 처리되었습니다.");
+          this.state.history.push("/");
+          return;
+        }
+        alert(result.status + " - 오류 메시지 : " + result.data.errorMessage);
+      });
     };
 
     const onChangTitle = (e) => {
@@ -267,7 +305,8 @@ class Notice extends Component {
             <Button
               variant='outlined'
               onClick={eventModifyClick}
-              hidden={this.state.buttonReadOnly.modifying}
+              hidden={this.state.buttonReadOnly.modifying && this.state.create}
+              disabled={this.state.buttonReadOnly.modifying}
             >
               Modify
             </Button>
@@ -276,7 +315,8 @@ class Notice extends Component {
             <Button
               variant='outlined'
               onClick={eventDeleteClick}
-              hidden={this.state.buttonReadOnly.modifying}
+              hidden={this.state.buttonReadOnly.modifying && this.state.create}
+              disabled={this.state.buttonReadOnly.modifying}
             >
               Delete
             </Button>

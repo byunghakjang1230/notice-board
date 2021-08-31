@@ -31,10 +31,13 @@ const Login = ({ history }) => {
       return;
     }
     const data = service.login(login);
-    data.then((value) => {
-      console.log(value.data);
-      loginService.setLoginToken(value.data.token);
-      history.push("/");
+    data.then((result) => {
+      if (result.status === 200) {
+        loginService.setLoginToken(result.data.token);
+        history.push("/");
+        return;
+      }
+      alert(result.status + " - 오류 메시지 : " + result.data.errorMessage);
     });
   };
   const onChangeEmail = (e) => {
