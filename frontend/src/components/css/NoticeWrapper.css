@@ -1,0 +1,10 @@
+.NoticeWrapper {
+  width: 50rem;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .NoticeWrapper {
+    width: 90%;
+  }
+}
